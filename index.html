@@ -1,1 +1,454 @@
-!doc
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HARAKAT | Motion in Design</title>
+    <style>
+        /* --- RESET & VARIABLES --- */
+        :root {
+            --bg-color: #0a0a0a;
+            --text-color: #f5f5f5;
+            --accent-color: #ffffff;
+            --secondary-text: #888888;
+            --card-bg: #141414;
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --transition-speed: 0.6s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        a { text-decoration: none; color: inherit; transition: color 0.3s; }
+        ul { list-style: none; }
+        img { width: 100%; display: block; }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes revealText {
+            0% { clip-path: inset(0 100% 0 0); }
+            100% { clip-path: inset(0 0 0 0); }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- NAVIGATION --- */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 2rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            mix-blend-mode: difference;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -5px;
+            left: 0;
+            background-color: white;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .cart-icon {
+            cursor: pointer;
+        }
+
+        /* --- HERO SECTION --- */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: 8vw;
+            line-height: 0.9;
+            text-transform: uppercase;
+            letter-spacing: -4px;
+            text-align: center;
+            opacity: 0; /* JS will trigger animation */
+            animation: fadeInUp 1s forwards 0.5s;
+        }
+
+        .hero p {
+            margin-top: 1rem;
+            color: var(--secondary-text);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0;
+            animation: fadeInUp 1s forwards 0.8s;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+
+        /* --- PRODUCT SHOWCASE --- */
+        .section-title {
+            padding: 4rem 5% 2rem;
+            font-size: 1rem;
+            text-transform: uppercase;
+            color: var(--secondary-text);
+            border-bottom: 1px solid #222;
+            margin-bottom: 2rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2px; /* Slight gap for background showing through */
+            background-color: #222; /* Border color effect */
+            padding: 0 5%;
+        }
+
+        .product-card {
+            background-color: var(--bg-color);
+            padding: 2rem;
+            position: relative;
+            transition: background-color 0.4s;
+            cursor: pointer;
+            group: 'hover';
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover {
+            background-color: var(--card-bg);
+        }
+
+        .product-image-placeholder {
+            width: 100%;
+            height: 400px;
+            background-color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .product-image-placeholder::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a1a1a, #222);
+            opacity: 0.5;
+        }
+
+        .card-details h3 {
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-details .price {
+            color: var(--secondary-text);
+            font-size: 1rem;
+        }
+
+        .add-btn {
+            margin-top: 1rem;
+            padding: 1rem 0;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: transparent;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .product-card:hover .add-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .add-btn:hover {
+            background: white;
+            color: black;
+        }
+
+        /* --- BRAND STATEMENT --- */
+        .marquee-section {
+            padding: 8rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .marquee-content {
+            display: inline-block;
+            font-size: 6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+            color: transparent;
+            animation: marquee 20s linear infinite;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- FOOTER --- */
+        footer {
+            border-top: 1px solid #222;
+            padding: 4rem 5%;
+            margin-top: 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-col h4 {
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-col a {
+            color: var(--secondary-text);
+        }
+
+        .footer-col a:hover {
+            color: white;
+        }
+
+        .newsletter input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #333;
+            padding: 1rem 0;
+            width: 300px;
+            color: white;
+            font-family: inherit;
+        }
+        
+        .newsletter input:focus {
+            outline: none;
+            border-bottom-color: white;
+        }
+
+        /* --- MEDIA QUERIES --- */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 15vw; }
+            .products-grid { grid-template-columns: 1fr; }
+            .nav-links { display: none; } /* Simplified for demo */
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">Harakat.</div>
+        <div class="nav-links">
+            <a href="#">Home</a>
+            <a href="#catalog">Catalog</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </div>
+        <div class="cart-icon">CART (0)</div>
+    </nav>
+
+    <section class="hero">
+        <h1>Motion<br>Defined.</h1>
+        <p>Premium Streetwear Essentials</p>
+        <div class="scroll-indicator">Scroll Down</div>
+    </section>
+
+    <div class="marquee-section">
+        <div class="marquee-content">
+            HARAKAT — MOTION — MOVEMENT — STYLE — HARAKAT — MOTION — MOVEMENT — STYLE
+        </div>
+    </div>
+
+    <div id="catalog">
+        <div class="section-title">Latest Collection</div>
+        
+        <div class="products-grid">
+            <div class="product-card animate-on-scroll">
+                <div class="product-image-placeholder">
+                    <span style="color:#555">SKULL CAP PREVIEW</span>
+                </div>
+                <div class="card-details">
+                    <div>
+                        <h3>Satin Lined Skull Cap</h3>
+                        <p class="price">£19.99</p>
+                    </div>
+                    <button class="add-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card animate-on-scroll">
+                <div class="product-image-placeholder">
+                    <span style="color:#555">WASHED BLACK PREVIEW</span>
+                </div>
+                <div class="card-details">
+                    <div>
+                        <h3>Premium LS - Washed Black</h3>
+                        <p class="price">£39.99</p>
+                    </div>
+                    <button class="add-btn">Add to Cart</button>
+                </div>
+            </div>
+
+            <div class="product-card animate-on-scroll">
+                <div class="product-image-placeholder">
+                    <span style="color:#555">PURE WHITE PREVIEW</span>
+                </div>
+                <div class="card-details">
+                    <div>
+                        <h3>Premium LS - Pure White</h3>
+                        <p class="price">£39.99</p>
+                    </div>
+                    <button class="add-btn">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-col">
+            <h4>Harakat</h4>
+            <ul>
+                <li><a href="#">About Us</a></li>
+                <li><a href="#">Careers</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+            </ul>
+        </div>
+        <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="#">FAQ</a></li>
+                <li><a href="#">Shipping</a></li>
+                <li><a href="#">Returns</a></li>
+            </ul>
+        </div>
+        <div class="footer-col newsletter">
+            <h4>Join the Movement</h4>
+            <input type="email" placeholder="ENTER YOUR EMAIL">
+        </div>
+    </footer>
+
+    <script>
+        // Smooth reveal animation on scroll
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Simple Cart Interaction (Demo)
+        let cartCount = 0;
+        const cartLabel = document.querySelector('.cart-icon');
+        const buttons = document.querySelectorAll('.add-btn');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent card click
+                cartCount++;
+                cartLabel.textContent = `CART (${cartCount})`;
+                btn.textContent = 'ADDED';
+                setTimeout(() => {
+                    btn.textContent = 'ADD TO CART';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
